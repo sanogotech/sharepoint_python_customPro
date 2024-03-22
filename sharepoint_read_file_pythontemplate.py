@@ -1,7 +1,7 @@
 #pip install Office365-REST-Python-Client
-#pip install git+https://github.com/vgrem/Office365-REST-Python-Client.git
 
 # courtesy: https://stackoverflow.com/questions/59979467/accessing-microsoft-sharepoint-files-and-data-using-python
+# bugs :  https://learn.microsoft.com/en-us/answers/questions/203179/getfolderbyserverrelativeurl-rest-api-return-serve
 
 #Importing required libraries
 
@@ -13,16 +13,13 @@ import os
 import ssl
 
 #Constrtucting SharePoint URL and credentials 
+# sharepoint_base_url = 'https://mycompany.sharepoint.com/teams/sharepointname/' ou https://mycompany.sharepoint.com/Sitesharepointname/'
+sharepoint_base_url = 'https://mycompany.sharepoint.com/teams/sharepointname/'
+sharepoint_user = 'user'
+sharepoint_password = 'pwd'
+folder_in_sharepoint = ="/sites/sub_site/Shared%20Documents/YourFolderName/"
 
-#sharepoint_base_url = 'https://mycompany.sharepoint.com/teams/sharepointname/'
 
-sharepoint_base_url = 'https://ciesodecigs2e.sharepoint.com/dri/'
-# sharepoint_user = 'user'
-#sharepoint_password = 'pwd'
-sharepoint_user = 'souleysanogo@gs2e.ci'
-sharepoint_password = 'forHAKIM78'
-#folder_in_sharepoint = '/teams/sharepointname/Shared%20Documents/YourFolderName/'
-folder_in_sharepoint = '/dri/Documents%20partages/CCDC/CIE/2021/TECHNIQUE/PRODUCTION/B-Documents%20annuels/01-Rapport%20annuel%20de%20perf%20du%20segment%20Production/'
 #Constructing Details For Authenticating SharePoint
 
 # Emplacement local pour télécharger les fichiers
@@ -98,43 +95,7 @@ def download_files(ctx, folder_url, local_path):
                          f"Propriétaire: {author_name}, Créé le: {created}, Modifié le: {modified}, "
                          f"Type de contenu: {content_type_id}\n")
 
-"""
-def download_files(ctx, folder_url, local_path):
-    folder = ctx.web.get_folder_by_server_relative_url(folder_url)
-    files = folder.files
-    ctx.load(files)
-    ctx.execute_query()
 
-    for file in files:
-        # Téléchargement du fichier
-        download_file(ctx, file.properties["ServerRelativeUrl"], local_path)
-
-        # Récupération de l'objet ListItem associé au fichier pour accéder aux métadonnées
-        list_item = file.listItemAllFields
-        ctx.load(list_item)
-        ctx.load(list_item, "Author")  # Pré-chargement de l'auteur
-        ctx.execute_query()
-
-        # Tentative de récupération du nom de l'auteur
-        try:
-            author = list_item.author
-            ctx.load(author)
-            ctx.execute_query()
-            author_name = author.properties.get("Title", "Inconnu")
-        except AttributeError:
-            author_name = "Inconnu"
-
-        created = list_item.properties.get("Created", "Inconnue")
-        modified = list_item.properties.get("Modified", "Inconnue")
-        content_type_id = list_item.properties.get("ContentTypeId", "Inconnu")
-
-        # Écriture des métadonnées dans le fichier rapport
-        with open('rapportdownload.txt', 'a', encoding='utf-8') as report:
-            report.write(f"Nom: {file.properties['Name']}, "
-                         f"Propriétaire: {author_name}, Créé le: {created}, Modifié le: {modified}, "
-                         f"Type de contenu: {content_type_id}\n")
-
-"""
 
 
 def download_file(ctx, file_url, local_path):
@@ -152,11 +113,5 @@ download_files(ctx, folder_in_sharepoint, download_path)
 
 print("Téléchargement terminé. Vérifiez le dossier local et le fichier rapportdownload.txt pour les détails.")
 
-#Reading File from SharePoint Folder
-# sharepoint_file = '/teams/SustainabilityDataAccelerator/Shared%20Documents/General/Agro/2018_indirects_sustainable_sourcing_template.xlsx'
-#file_response = File.open_binary(ctx, sharepoint_file)
 
-#Saving file to local
-#with open("sharepointfile.csv", 'wb') as output_file:  
-#    output_file.write(file_response.content)
 

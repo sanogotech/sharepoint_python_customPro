@@ -1,0 +1,24 @@
+
+
+* https://learn.microsoft.com/en-us/answers/questions/203179/getfolderbyserverrelativeurl-rest-api-return-serve
+
+Jerryzy
+10,561Reputation points
+Dec 21, 2020, 2:18 AM
+Hi @g h ,
+
+Please modify the Rest EndPoint like below:
+
+
+Copy
+https://{server_name}/sites/{sub_site}/_api/web/GetFolderByServerRelativeUrl('/sites/sub_site/Shared%20Documents')/Files  
+The ServerRelativeUrl needs to prepend /sites/sitename.
+
+Thanks
+Best Regards
+
+If an Answer is helpful, please click "Accept Answer" and upvote it.
+Note: Please follow the steps in our documentation to enable e-mail notifications if you want to receive the related email notification for this thread.
+
+
+*folder_in_sharepoint = = "/sites/sub_site/Shared%20Documents"
