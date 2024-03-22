@@ -1,5 +1,6 @@
 #pip install Office365-REST-Python-Client
 #pip install git+https://github.com/vgrem/Office365-REST-Python-Client.git
+
 # courtesy: https://stackoverflow.com/questions/59979467/accessing-microsoft-sharepoint-files-and-data-using-python
 
 #Importing required libraries
@@ -70,18 +71,71 @@ file_list = folder_details(ctx, folder_in_sharepoint)
 print(file_list)
 
 
-# Fonction pour télécharger des fichiers
 def download_files(ctx, folder_url, local_path):
     folder = ctx.web.get_folder_by_server_relative_url(folder_url)
     files = folder.files
     ctx.load(files)
     ctx.execute_query()
+
     for file in files:
         # Téléchargement du fichier
         download_file(ctx, file.properties["ServerRelativeUrl"], local_path)
-        # Écriture des métadonnées dans un fichier texte
-        with open('rapportdownload.txt', 'a') as report:
-            report.write(f"Nom: {file.properties['Name']}, Taille: {file.properties['Length']} octets\n")
+
+        # Chargement des champs de l'élément associé pour accéder aux métadonnées
+        list_item = file.listItemAllFields
+        ctx.load(list_item)
+        ctx.execute_query()
+
+        # Accès sécurisé aux propriétés, avec des valeurs par défaut si non trouvées
+        author_name = list_item.properties.get("Author", {}).get("Title", "Inconnu")
+        created = list_item.properties.get("Created", "Inconnue")
+        modified = list_item.properties.get("Modified", "Inconnue")
+        content_type_id = list_item.properties.get("ContentTypeId", "Inconnu")
+
+        # Écriture des métadonnées dans le fichier rapport
+        with open('rapportdownload.txt', 'a', encoding='utf-8') as report:
+            report.write(f"Nom: {file.properties['Name']}, "
+                         f"Propriétaire: {author_name}, Créé le: {created}, Modifié le: {modified}, "
+                         f"Type de contenu: {content_type_id}\n")
+
+"""
+def download_files(ctx, folder_url, local_path):
+    folder = ctx.web.get_folder_by_server_relative_url(folder_url)
+    files = folder.files
+    ctx.load(files)
+    ctx.execute_query()
+
+    for file in files:
+        # Téléchargement du fichier
+        download_file(ctx, file.properties["ServerRelativeUrl"], local_path)
+
+        # Récupération de l'objet ListItem associé au fichier pour accéder aux métadonnées
+        list_item = file.listItemAllFields
+        ctx.load(list_item)
+        ctx.load(list_item, "Author")  # Pré-chargement de l'auteur
+        ctx.execute_query()
+
+        # Tentative de récupération du nom de l'auteur
+        try:
+            author = list_item.author
+            ctx.load(author)
+            ctx.execute_query()
+            author_name = author.properties.get("Title", "Inconnu")
+        except AttributeError:
+            author_name = "Inconnu"
+
+        created = list_item.properties.get("Created", "Inconnue")
+        modified = list_item.properties.get("Modified", "Inconnue")
+        content_type_id = list_item.properties.get("ContentTypeId", "Inconnu")
+
+        # Écriture des métadonnées dans le fichier rapport
+        with open('rapportdownload.txt', 'a', encoding='utf-8') as report:
+            report.write(f"Nom: {file.properties['Name']}, "
+                         f"Propriétaire: {author_name}, Créé le: {created}, Modifié le: {modified}, "
+                         f"Type de contenu: {content_type_id}\n")
+
+"""
+
 
 def download_file(ctx, file_url, local_path):
     response = File.open_binary(ctx, file_url)
